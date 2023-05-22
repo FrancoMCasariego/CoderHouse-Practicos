@@ -1,0 +1,8 @@
+.carro{
+    text-align: right;
+    margin-right: 10%;
+
+}
+.carro:hover{
+    color: red
+}
