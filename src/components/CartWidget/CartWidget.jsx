@@ -2,7 +2,7 @@ import cart from "./assets/carrito-de-compras.png"
 import "./CartWidget.modules.css"
 
 
-const CartWidget =() => {
+const CartWidget =({productCount = 0}) => {
     return (
         <div class="carro">
             <img src={cart} alt="cart-widget"/>

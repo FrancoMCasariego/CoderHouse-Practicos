@@ -1,0 +1,48 @@
+/* Item Count */
+.ItemCount {
+    width: 100px;
+    margin: 10px;
+    border: 1px solid black;
+    padding: 10px;
+    background-color: lightgray;
+  }
+  
+  /* Button */
+  button {
+    cursor: pointer;
+    background-color: lightgreen;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 5px;
+    float: left;
+  }
+  
+  /* Decrement Button */
+  .decrement {
+    background-color: red;
+  }
+  
+  /* Increment Button */
+  .increment {
+    background-color: green;
+  }
+  
+  /* Disabled Button */
+  .disabled {
+    cursor: not-allowed;
+ text-align: center;
+  }
+
+  .boton1 {
+    display: flex;
+    text-align: center;
+    margin-left: 40%;
+  }
+  .boton {
+    width: 50px;
+    height: 25px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    
+  }

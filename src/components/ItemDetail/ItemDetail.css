@@ -1,0 +1,35 @@
+
+
+  .card-img-top {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+  }
+  
+  .card-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .card-text {
+    margin-bottom: 10px;
+    display: flex;
+  }
+  
+  .badge {
+    background-color: lightblue;
+    color: white;
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+  
+  .text-bg-info {
+    background-color: #ADD8E6;
+    color: white;
+    font-size: 12px;
+    padding: 5px 10px;
+    
+  }
+.image{
+margin-left: 20%;
+}

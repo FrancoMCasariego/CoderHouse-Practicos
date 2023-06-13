@@ -1,5 +1,7 @@
 h1{
     font-family: sans-serif;
-    color:coral;
     text-align: center;
+}
+*{
+    background-color: gray;
 }

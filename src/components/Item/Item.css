@@ -1,0 +1,14 @@
+.cardProducto {
+  background-color: lightblue;
+}
+
+.imgProducto {
+  width: 500px;
+  height: 500px;
+  margin-top: 10px;
+  display: center;
+}
+
+.detalle {
+  color: white;
+}
