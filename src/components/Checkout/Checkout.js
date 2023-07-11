@@ -1,92 +1,72 @@
-import { collection, query, where, documentId, getDocs, writeBatch, addDoc } from "firebase/firestore"
-import { cartContext } from "../../context/cartContext"
-import { db } from "../../services/firebase/firebaseConfig"
-import { useNotification } from "../../notification/NotificationService"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useContext, useState } from "react"
+import { CartContext } from "../../context/CartContext"
+import CheckoutForm from "../CheckoutForm/CheckoutForm"
+import {db} from "../../services/firebase/firebaseConfig"
 
-const Checkout = () => {
+const Checkout = ()=>{
     const [loading, setLoading] = useState(false)
-    const { cart, total, clearCart } = cartContext()
-
-    const { setNotification } = useNotification()
-
-    const navigate = useNavigate()
-
-    const createOrder = async () => {
+    const [orderId, setOrderId] = useState("")
+    const[cart, total, clearCart] = useContext(CartContext)
+    const createOrder = async({name, phone, email}) =>{
         setLoading(true)
-        const objOrder = {
-            buyer: {
-                name: '',
-                phone: '',
-                email: ''
-            },
-            items: cart,
-            total
-        }
-
         try {
-            const ids = cart.map(prod => prod.id)
-
-            const productsRef = query(collection(db, 'products'), where(documentId(), 'in', ids))
-    
-            // getDocs(productsRef).then(querySnapshot => {
-            // })
-    
-            const { docs } = await getDocs(productsRef)
-    
+            const objOrder ={
+                buyer: {
+                    name, phone, email
+                },
+                items: cart,
+                total: total,
+                date: Timestamp.fromDate(new Date())
+            }
             const batch = writeBatch(db)
-    
             const outOfStock = []
-    
-            docs.forEach(doc => {
-                const fieldsDoc = doc.data()
-                const stockDb = fieldsDoc.stock
-    
-                const productAddedToCart = cart.find(prod => prod.id === doc.id)
+            const ids = cart.map(prod=>prod.id)
+            const productsRef = collection(db, 'products')
+            const productsAddedFromFirestore = await getDocs(query(productsRef, where(documentId(), 'in', ids)))
+            const {docs} = productsAddedFromFirestore
+
+            docs.forEach(doc=>{
+                const dataDoc = doc.data()
+                const stockDb = dataDoc.stock
+
+                const productAddedToCart = cart.find(prod=> prod.id === doc.id)
                 const prodQuantity = productAddedToCart?.quantity
-    
-                if(stockDb >= prodQuantity) {
-                    //updateDoc
-                    batch.update(doc.ref, { stock: stockDb - prodQuantity })
-                } else {
-                    outOfStock.push({ id: doc.id, ...fieldsDoc})
+                if(stockDb >= prodQuantity){
+                    batch.update(doc.ref, {stock: stockDb - prodQuantity})
+                }else{
+                    outOfStock.push({id: doc.id, ...dataDoc})
                 }
             })
-    
-            if(outOfStock.length === 0) {
-                batch.commit()
-                
-                const ordersRef = collection(db, 'orders')
-    
-                const { id } = await addDoc(ordersRef, objOrder)
-
-                setNotification('success', 'La orden fue generada correctamente, el id es: ' + id)
+            if(outOfStock.length === 0){
+                await batch.commit()
+                const orderRef = collection(db, 'orders')
+                const orderAdded = await addDoc(orderRef, objOrder)
+                setOrderId(orderAdded.id)
                 clearCart()
-                navigate('/')
-            } else {
-                setNotification('error', 'hay productos que no tienen stock')
+            }else{
+                console.error('Hay productos que estan fuera de stock')
             }
-        } catch (error) {
-            setNotification('error', 'hubo un error en la generacion de la orden')
-        } finally {
+        } catch(error){
+            console.log(error)
+        }finally{
             setLoading(false)
         }
     }
 
-    if(loading) {
-        return (
-            <h1>Se esta generando su orden...</h1>
-        )
+    if (loading) {
+        return <h1>Se esta generando su orden...</h1>
     }
-
-    return (
-        <>
+    if (orderId) {
+        return <h1>El id de su orden es: {orderId}</h1>
+    }
+    
+    return(
+        <div>
             <h1>Checkout</h1>
-            <h2>Formulario</h2>
-            <button onClick={createOrder}>Generar orden de compra</button>
-        </>
-    )
+            <CheckoutForm onConfirm= {createOrder}/>
+        </div>
+
+    ) 
 }
 
-export default Checkout 
+export default Checkout
